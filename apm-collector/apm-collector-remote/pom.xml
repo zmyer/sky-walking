@@ -5,7 +5,7 @@
     <parent>
         <artifactId>apm-collector</artifactId>
         <groupId>org.skywalking</groupId>
-        <version>3.2-2017</version>
+        <version>3.2.3-2017</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -16,19 +16,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <grpc.version>1.4.0</grpc.version>
         <netty.version>4.1.12.Final</netty.version>
+        <compiler.version>1.6</compiler.version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.skywalking</groupId>
-            <artifactId>apm-collector-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.skywalking</groupId>
-            <artifactId>apm-collector-server</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-netty</artifactId>

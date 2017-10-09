@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.skywalking</groupId>
         <artifactId>apm-sniffer</artifactId>
-        <version>3.2-2017</version>
+        <version>3.2.3-2017</version>
     </parent>
 
     <artifactId>apm-agent</artifactId>
@@ -80,6 +80,56 @@
             <artifactId>apm-feign-default-http-9.x-plugin</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.skywalking</groupId>
+            <artifactId>apm-resttemplate-4.3.x-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.skywalking</groupId>
+            <artifactId>apm-spring-concurrent-util-4.x-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.skywalking</groupId>
+            <artifactId>apm-springmvc-annotation-4.x-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.skywalking</groupId>
+            <artifactId>apm-spring-cloud-feign-1.x-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.skywalking</groupId>
+            <artifactId>apm-struts2-2.x-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.skywalking</groupId>
+            <artifactId>apm-nutz-mvc-annotation-1.x-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.skywalking</groupId>
+            <artifactId>apm-nutz-http-1.x-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.skywalking</groupId>
+            <artifactId>apm-jetty-client-9.x-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.skywalking</groupId>
+            <artifactId>apm-jetty-server-9.x-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.skywalking</groupId>
+            <artifactId>apm-spymemcached-2.x-plugin</artifactId>
+            <version>${project.version}</version>
+         </dependency>
 
         <!-- activation -->
         <dependency>
@@ -101,13 +151,13 @@
 
         <dependency>
             <groupId>org.skywalking</groupId>
-            <artifactId>apm-toolkit-trace-context-activation</artifactId>
+            <artifactId>apm-toolkit-opentracing-activation</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.skywalking</groupId>
-            <artifactId>apm-toolkit-opentracing-activation</artifactId>
+            <artifactId>apm-toolkit-trace-activation</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -132,11 +182,11 @@
                             <shadeSourcesContent>true</shadeSourcesContent>
                             <transformers>
                                 <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>skywalking-plugin.def</resource>
                                 </transformer>
                                 <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
                                         <Premain-Class>${premain.class}</Premain-Class>
                                     </manifestEntries>
@@ -161,6 +211,25 @@
                                     <shadedPattern>${shade.net.bytebuddy.target}</shadedPattern>
                                 </relocation>
                             </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="${project.basedir}/../../packages"/>
+                                <copy file="${project.build.directory}/skywalking-agent.jar"
+                                      tofile="${project.basedir}/../../packages/skywalking-agent.jar" overwrite="true"/>
+                            </tasks>
                         </configuration>
                     </execution>
                 </executions>

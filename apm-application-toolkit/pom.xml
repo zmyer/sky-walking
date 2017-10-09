@@ -3,7 +3,7 @@
     <parent>
         <artifactId>apm</artifactId>
         <groupId>org.skywalking</groupId>
-        <version>3.2-2017</version>
+        <version>3.2.3-2017</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>apm-application-toolkit</artifactId>
@@ -17,7 +17,7 @@
         <module>apm-toolkit-log4j-1.x</module>
         <module>apm-toolkit-log4j-2.x</module>
         <module>apm-toolkit-logback-1.x</module>
-        <module>apm-toolkit-trace-context</module>
         <module>apm-toolkit-opentracing</module>
+        <module>apm-toolkit-trace</module>
     </modules>
 </project>

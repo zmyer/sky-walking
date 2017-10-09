@@ -5,10 +5,33 @@
     <parent>
         <artifactId>apm-collector</artifactId>
         <groupId>org.skywalking</groupId>
-        <version>3.2-2017</version>
+        <version>3.2.3-2017</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>apm-collector-ui</artifactId>
     <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.skywalking</groupId>
+            <artifactId>apm-collector-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.skywalking</groupId>
+            <artifactId>apm-collector-cluster</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.skywalking</groupId>
+            <artifactId>apm-collector-server</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.skywalking</groupId>
+            <artifactId>apm-collector-storage</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>

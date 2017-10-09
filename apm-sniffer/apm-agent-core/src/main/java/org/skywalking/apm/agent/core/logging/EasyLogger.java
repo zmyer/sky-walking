@@ -1,15 +1,15 @@
 package org.skywalking.apm.agent.core.logging;
 
-import org.skywalking.apm.agent.core.conf.Config;
-import org.skywalking.apm.agent.core.conf.Constants;
-import org.skywalking.apm.util.StringUtil;
-import org.skywalking.apm.logging.ILog;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Matcher;
+
+import org.skywalking.apm.agent.core.conf.Config;
+import org.skywalking.apm.agent.core.conf.Constants;
+import org.skywalking.apm.logging.ILog;
+import org.skywalking.apm.util.StringUtil;
 
 /**
  * The <code>EasyLogger</code> is a simple implementation of {@link ILog}.
@@ -37,8 +37,10 @@ public class EasyLogger implements ILog {
             if (parametersIndex >= parameters.length) {
                 break;
             }
-
-            tmpMessage = tmpMessage.replaceFirst("\\{\\}", URLEncoder.encode(String.valueOf(parameters[parametersIndex++])));
+            /**
+             * @Fix the Illegal group reference issue
+             */
+            tmpMessage = tmpMessage.replaceFirst("\\{\\}", Matcher.quoteReplacement(String.valueOf(parameters[parametersIndex++])));
             startSize = index + 2;
         }
         return tmpMessage;

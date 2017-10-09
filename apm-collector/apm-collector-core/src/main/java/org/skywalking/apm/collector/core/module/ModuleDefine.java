@@ -1,8 +1,9 @@
 package org.skywalking.apm.collector.core.module;
 
+import java.util.List;
 import org.skywalking.apm.collector.core.client.Client;
-import org.skywalking.apm.collector.core.framework.DataInitializer;
 import org.skywalking.apm.collector.core.framework.Define;
+import org.skywalking.apm.collector.core.framework.Handler;
 import org.skywalking.apm.collector.core.server.Server;
 
 /**
@@ -10,7 +11,7 @@ import org.skywalking.apm.collector.core.server.Server;
  */
 public abstract class ModuleDefine implements Define {
 
-    protected abstract ModuleGroup group();
+    protected abstract String group();
 
     public abstract boolean defaultModule();
 
@@ -20,7 +21,9 @@ public abstract class ModuleDefine implements Define {
 
     protected abstract Server server();
 
-    protected abstract DataInitializer dataInitializer();
+    public abstract List<Handler> handlerList();
 
     protected abstract ModuleRegistration registration();
+
+    protected abstract void initializeOtherContext();
 }

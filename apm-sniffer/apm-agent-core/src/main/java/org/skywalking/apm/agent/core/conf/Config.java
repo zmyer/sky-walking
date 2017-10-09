@@ -16,7 +16,7 @@ public class Config {
     public static class Agent {
         /**
          * Application code is showed in sky-walking-ui.
-         * Suggestion: set a unique name for each application, one application's nodes share the same code.
+         * Suggestion: set an unique name for each application, one application's nodes share the same code.
          */
         public static String APPLICATION_CODE = "";
 
@@ -30,7 +30,7 @@ public class Config {
          * If the operation name of the first span is included in this set,
          * this segment should be ignored.
          */
-        public static String IGNORE_SUFFIX = ".jpg,.jpeg,.js,.css,.png,.bmp,.gif,.ico,.mp3,.mp4,.html";
+        public static String IGNORE_SUFFIX = ".jpg,.jpeg,.js,.css,.png,.bmp,.gif,.ico,.mp3,.mp4,.html,.svg";
     }
 
     public static class Collector {
@@ -41,7 +41,7 @@ public class Config {
         /**
          * application and service registry check interval
          */
-        public static long APP_AND_SERVICE_REGISTER_CHECK_INTERVAL = 10;
+        public static long APP_AND_SERVICE_REGISTER_CHECK_INTERVAL = 3;
         /**
          * discovery rest check interval
          */
@@ -57,7 +57,7 @@ public class Config {
         /**
          * Collector service discovery REST service name
          */
-        public static String DISCOVERY_SERVICE_NAME = "/grpc/addresses";
+        public static String DISCOVERY_SERVICE_NAME = "/agentstream/grpc";
     }
 
     public static class Jvm {
@@ -133,14 +133,6 @@ public class Config {
              * Only trace the operation, not include parameters.
              */
             public static boolean TRACE_PARAM = false;
-        }
-
-        public static class Propagation {
-
-            /**
-             * The header name of cross process propagation data.
-             */
-            public static String HEADER_NAME = "sw3";
         }
     }
 }

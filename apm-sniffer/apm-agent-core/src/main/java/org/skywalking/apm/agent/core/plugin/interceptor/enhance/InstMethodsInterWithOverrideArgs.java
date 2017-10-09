@@ -53,13 +53,13 @@ public class InstMethodsInterWithOverrideArgs {
     public Object intercept(@This Object obj,
         @AllArguments Object[] allArguments,
         @Origin Method method,
-        @Morph(defaultMethod = true) OverrideCallable zuper
+        @Morph OverrideCallable zuper
     ) throws Throwable {
         EnhancedInstance targetObject = (EnhancedInstance)obj;
 
         MethodInterceptResult result = new MethodInterceptResult();
         try {
-            interceptor.beforeMethod(targetObject, method.getName(), allArguments, method.getParameterTypes(),
+            interceptor.beforeMethod(targetObject, method, allArguments, method.getParameterTypes(),
                 result);
         } catch (Throwable t) {
             logger.error(t, "class[{}] before method[{}] intercept failure", obj.getClass(), method.getName());
@@ -74,7 +74,7 @@ public class InstMethodsInterWithOverrideArgs {
             }
         } catch (Throwable t) {
             try {
-                interceptor.handleMethodException(targetObject, method.getName(), allArguments, method.getParameterTypes(),
+                interceptor.handleMethodException(targetObject, method, allArguments, method.getParameterTypes(),
                     t);
             } catch (Throwable t2) {
                 logger.error(t2, "class[{}] handle method[{}] exception failure", obj.getClass(), method.getName());
@@ -82,7 +82,7 @@ public class InstMethodsInterWithOverrideArgs {
             throw t;
         } finally {
             try {
-                ret = interceptor.afterMethod(targetObject, method.getName(), allArguments, method.getParameterTypes(),
+                ret = interceptor.afterMethod(targetObject, method, allArguments, method.getParameterTypes(),
                     ret);
             } catch (Throwable t) {
                 logger.error(t, "class[{}] after method[{}] intercept failure", obj.getClass(), method.getName());

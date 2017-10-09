@@ -3,15 +3,16 @@ package org.skywalking.apm.plugin.feign.http.v9;
 import feign.Request;
 import feign.Response;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import org.skywalking.apm.agent.core.conf.Config;
+import org.skywalking.apm.agent.core.context.CarrierItem;
 import org.skywalking.apm.agent.core.context.ContextCarrier;
 import org.skywalking.apm.agent.core.context.ContextManager;
 import org.skywalking.apm.agent.core.context.tag.Tags;
@@ -36,10 +37,11 @@ public class DefaultHttpClientInterceptor implements InstanceMethodsAroundInterc
      * port, kind, component, url from {@link feign.Request}.
      * Through the reflection of the way, set the http header of context data into {@link feign.Request#headers}.
      *
+     * @param method
      * @param result change this result, if you want to truncate the method.
      * @throws Throwable
      */
-    @Override public void beforeMethod(EnhancedInstance objInst, String methodName, Object[] allArguments,
+    @Override public void beforeMethod(EnhancedInstance objInst, Method method, Object[] allArguments,
         Class<?>[] argumentsTypes, MethodInterceptResult result) throws Throwable {
         Request request = (Request)allArguments[0];
 
@@ -52,9 +54,6 @@ public class DefaultHttpClientInterceptor implements InstanceMethodsAroundInterc
         Tags.URL.set(span, url.getPath());
         SpanLayer.asHttp(span);
 
-        List<String> contextCollection = new ArrayList<String>();
-        contextCollection.add(contextCarrier.serialize());
-
         Field headersField = Request.class.getDeclaredField("headers");
         Field modifiersField = Field.class.getDeclaredField("modifiers");
         modifiersField.setAccessible(true);
@@ -62,7 +61,13 @@ public class DefaultHttpClientInterceptor implements InstanceMethodsAroundInterc
 
         headersField.setAccessible(true);
         Map<String, Collection<String>> headers = new LinkedHashMap<String, Collection<String>>();
-        headers.put(Config.Plugin.Propagation.HEADER_NAME, contextCollection);
+        CarrierItem next = contextCarrier.items();
+        while (next.hasNext()) {
+            next = next.next();
+            List<String> contextCollection = new LinkedList<String>();
+            contextCollection.add(next.getHeadValue());
+            headers.put(next.getHeadKey(), contextCollection);
+        }
         headers.putAll(request.headers());
 
         headersField.set(request, Collections.unmodifiableMap(headers));
@@ -73,19 +78,22 @@ public class DefaultHttpClientInterceptor implements InstanceMethodsAroundInterc
      * the server.
      * Finish the {@link AbstractSpan}.
      *
+     * @param method
      * @param ret the method's original return value.
      * @return
      * @throws Throwable
      */
-    @Override public Object afterMethod(EnhancedInstance objInst, String methodName, Object[] allArguments,
+    @Override public Object afterMethod(EnhancedInstance objInst, Method method, Object[] allArguments,
         Class<?>[] argumentsTypes, Object ret) throws Throwable {
         Response response = (Response)ret;
-        int statusCode = response.status();
+        if (response != null) {
+            int statusCode = response.status();
 
-        AbstractSpan span = ContextManager.activeSpan();
-        if (statusCode >= 400) {
-            span.errorOccurred();
-            Tags.STATUS_CODE.set(span, statusCode + "");
+            AbstractSpan span = ContextManager.activeSpan();
+            if (statusCode >= 400) {
+                span.errorOccurred();
+                Tags.STATUS_CODE.set(span, statusCode + "");
+            }
         }
 
         ContextManager.stopSpan();
@@ -93,7 +101,7 @@ public class DefaultHttpClientInterceptor implements InstanceMethodsAroundInterc
         return ret;
     }
 
-    @Override public void handleMethodException(EnhancedInstance objInst, String methodName, Object[] allArguments,
+    @Override public void handleMethodException(EnhancedInstance objInst, Method method, Object[] allArguments,
         Class<?>[] argumentsTypes, Throwable t) {
         AbstractSpan activeSpan = ContextManager.activeSpan();
         activeSpan.log(t);

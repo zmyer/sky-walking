@@ -1,11 +1,12 @@
 package org.skywalking.apm.plugin.httpClient.v4;
 
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
-import org.skywalking.apm.agent.core.conf.Config;
+import org.skywalking.apm.agent.core.context.CarrierItem;
 import org.skywalking.apm.agent.core.context.ContextCarrier;
 import org.skywalking.apm.agent.core.context.ContextManager;
 import org.skywalking.apm.agent.core.context.tag.Tags;
@@ -18,7 +19,7 @@ import org.skywalking.apm.network.trace.component.ComponentsDefine;
 
 public class HttpClientExecuteInterceptor implements InstanceMethodsAroundInterceptor {
 
-    @Override public void beforeMethod(EnhancedInstance objInst, String methodName, Object[] allArguments,
+    @Override public void beforeMethod(EnhancedInstance objInst, Method method, Object[] allArguments,
         Class<?>[] argumentsTypes, MethodInterceptResult result) throws Throwable {
         if (allArguments[0] == null || allArguments[1] == null) {
             // illegal args, can't trace. ignore.
@@ -41,10 +42,14 @@ public class HttpClientExecuteInterceptor implements InstanceMethodsAroundInterc
         Tags.HTTP.METHOD.set(span, httpRequest.getRequestLine().getMethod());
         SpanLayer.asHttp(span);
 
-        httpRequest.setHeader(Config.Plugin.Propagation.HEADER_NAME, contextCarrier.serialize());
+        CarrierItem next = contextCarrier.items();
+        while (next.hasNext()) {
+            next = next.next();
+            httpRequest.setHeader(next.getHeadKey(), next.getHeadValue());
+        }
     }
 
-    @Override public Object afterMethod(EnhancedInstance objInst, String methodName, Object[] allArguments,
+    @Override public Object afterMethod(EnhancedInstance objInst, Method method, Object[] allArguments,
         Class<?>[] argumentsTypes, Object ret) throws Throwable {
         if (allArguments[0] == null || allArguments[1] == null) {
             return ret;
@@ -62,7 +67,7 @@ public class HttpClientExecuteInterceptor implements InstanceMethodsAroundInterc
         return ret;
     }
 
-    @Override public void handleMethodException(EnhancedInstance objInst, String methodName, Object[] allArguments,
+    @Override public void handleMethodException(EnhancedInstance objInst, Method method, Object[] allArguments,
         Class<?>[] argumentsTypes, Throwable t) {
         AbstractSpan activeSpan = ContextManager.activeSpan();
         activeSpan.errorOccurred();
